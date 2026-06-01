@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# custom
+.env*
+!.env.example
+.vscode/*
+!.vscode/settings.json
+.local/
+coverage/
