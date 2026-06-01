@@ -5,7 +5,9 @@ import { Geist, Geist_Mono } from "next/font/google"
 
 import { cn } from "@/lib/utils"
 import { siteConfig } from "@/lib/config"
+
 import { ScreenSize } from "@/components/screen-size"
+import { TRPCReactProvider } from "@/trpc/client/base"
 
 import "@/styles/globals.css"
 
@@ -56,8 +58,10 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
           fontGeistMono.variable,
         )}
       >
-        {children}
-        <ScreenSize />
+        <TRPCReactProvider>
+          {children}
+          <ScreenSize />
+        </TRPCReactProvider>
       </body>
     </html>
   )
