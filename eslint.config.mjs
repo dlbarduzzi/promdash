@@ -29,8 +29,6 @@ export default antfu({
     "node/prefer-global/process": "off",
     "prefer-const": "error",
     "perfectionist/sort-imports": "off",
-    "perfectionist/sort-named-exports": "off",
-    // "perfectionist/sort-named-imports": "off",
     "react-refresh/only-export-components": "off",
     "react-hooks-extra/no-direct-set-state-in-use-effect": "off",
     "style/arrow-parens": "off",
