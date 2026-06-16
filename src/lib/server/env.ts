@@ -6,6 +6,7 @@ export const env = createEnv({
     NODE_ENV: z.enum(["test", "development", "production"]),
     LOG_LEVEL: z.enum(["debug", "info", "warn", "error", "silent"]),
     DATABASE_URL: z.url(),
+    PROSYNC_URL: z.url(),
   },
   onValidationError: issues => {
     console.error(
@@ -20,6 +21,7 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     LOG_LEVEL: process.env.LOG_LEVEL,
     DATABASE_URL: process.env.DATABASE_URL,
+    PROSYNC_URL: process.env.PROSYNC_URL,
     /* eslint-enable node/no-process-env */
   },
   emptyStringAsUndefined: true,

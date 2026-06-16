@@ -4,6 +4,7 @@ import type { CreateAlertSchema } from "@/features/alerts/create/schema"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useId, useState } from "react"
+import { useSuspenseQuery } from "@tanstack/react-query"
 import { Controller, useForm } from "react-hook-form"
 
 import { Input } from "@/components/ui/input"
@@ -21,24 +22,49 @@ import {
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
 
 import { strings } from "@/tools/strings"
+import { useTRPC } from "@/trpc/client/base"
 import { cn, delay } from "@/lib/utils"
 import { SEVERITIES } from "@/db/schemas/alert"
 import { createAlertSchema } from "@/features/alerts/create/schema"
+import type { ClusterSchema } from "@/features/clusters/get/schema"
+
+export function Alerts() {
+  const trpc = useTRPC()
+  const resp = useSuspenseQuery(trpc.clusters.get.queryOptions())
+
+  if (!resp.data.ok) {
+    return (
+      <div className="p-4">
+        Server error! -
+        {" "}
+        {resp.data.error.reason}
+      </div>
+    )
+  }
+
+  return <CreateAlertForm clusters={resp.data.data} />
+}
 
 const severities = SEVERITIES.map(item => ({
   label: strings(item).capitalize(),
   value: item,
 }))
 
-export function Alerts() {
+type CreateAlertFormProps = {
+  clusters: Array<ClusterSchema>
+}
+
+function CreateAlertForm({ clusters }: CreateAlertFormProps) {
+  for (const cluster of clusters) {
+    console.warn(cluster.id)
+  }
+
   const [isDisabled, setIsDisabled] = useState(false)
 
   const form = useForm<CreateAlertSchema>({
@@ -63,23 +89,6 @@ export function Alerts() {
 
   return (
     <div className="p-4">
-      <div className="mb-4">
-        <Select>
-          <SelectTrigger className="w-full max-w-48">
-            <SelectValue placeholder="Select a fruit" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Fruits</SelectLabel>
-              <SelectItem value="apple">Apple</SelectItem>
-              <SelectItem value="banana">Banana</SelectItem>
-              <SelectItem value="blueberry">Blueberry</SelectItem>
-              <SelectItem value="grapes">Grapes</SelectItem>
-              <SelectItem value="pineapple">Pineapple</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </div>
       <div className="mb-4 text-right">
         <Button
           type="button"
