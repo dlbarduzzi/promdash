@@ -24,7 +24,6 @@ import {
   SelectGroup,
   SelectItem,
   SelectLabel,
-  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
@@ -34,36 +33,10 @@ import { cn, delay } from "@/lib/utils"
 import { SEVERITIES } from "@/db/schemas/alert"
 import { createAlertSchema } from "@/features/alerts/create/schema"
 
-const severities = SEVERITIES.map(item => {
-  let description = ""
-  switch (item) {
-    case "disabled":
-      description = "Alert notifications are disabled and no notifications will be sent."
-      break
-    case "info":
-      description = "Informational alert that provides visibility into system activity and does not require action."
-      break
-    case "minor":
-      description = "Low impact issue that may require attention but is unlikely to affect service availability."
-      break
-    case "warning":
-      description = "Potential issue that could lead to service degradation if left unresolved."
-      break
-    case "major":
-      description = "Significant issue affecting service health. Moogsoft creates a situation when the alert fires."
-      break
-    case "critical":
-      description = "Severe issue requiring immediate attention. Moogsoft creates a situation when the alert fires."
-      break
-    default:
-      throw new Error(`unhandled severity: ${item satisfies never}`)
-  }
-  return {
-    label: strings(item).capitalize(),
-    value: item,
-    description,
-  }
-})
+const severities = SEVERITIES.map(item => ({
+  label: strings(item).capitalize(),
+  value: item,
+}))
 
 export function Alerts() {
   const [isDisabled, setIsDisabled] = useState(false)
@@ -242,20 +215,11 @@ export function Alerts() {
                         <SelectValue placeholder="Select severity..." />
                       </SelectTrigger>
                       <SelectContent position="popper" className="py-1">
-                        {severities.map((severity, index) => (
+                        {severities.map(severity => (
                           <span key={severity.value}>
-                            <SelectItem
-                              key={severity.value}
-                              value={severity.value}
-                            >
-                              <span className="block">{severity.label}</span>
-                              <span className="mt-1.5 block text-[0.8rem] text-neutral-500 max-w-md">
-                                {severity.description}
-                              </span>
+                            <SelectItem value={severity.value}>
+                              {severity.label}
                             </SelectItem>
-                            {index === severities.length - 1 ? null : (
-                              <SelectSeparator />
-                            )}
                           </span>
                         ))}
                       </SelectContent>
