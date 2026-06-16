@@ -19,6 +19,7 @@ export default antfu({
     "build/**",
     "next-env.d.ts",
     "node_modules/**",
+    "src/db/migrations/**",
   ],
   rules: {
     "antfu/if-newline": "off",

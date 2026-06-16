@@ -1,16 +1,16 @@
 import Link from "next/link"
+import { Button } from "@/components/ui/button"
 
 export default function Page() {
   return (
     <div className="p-4">
       <div>Welcome to Promdash!</div>
-      <div>
-        <Link
-          href="/alerts"
-          className="text-sm text-neutral-900 font-semibold"
-        >
-          View Alerts
-        </Link>
+      <div className="mt-2">
+        <Button asChild>
+          <Link href="/alerts">
+            View Alerts
+          </Link>
+        </Button>
       </div>
     </div>
   )

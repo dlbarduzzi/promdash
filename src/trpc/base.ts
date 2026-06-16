@@ -1,16 +1,29 @@
+import z from "zod"
 import superjson from "superjson"
 
-import { logger } from "@/lib/logger"
 import { initTRPC } from "@trpc/server"
 
+import { db } from "@/db/connect"
+import { logger } from "@/lib/logger"
+
 async function createContext() {
-  return { logger }
+  return { db, logger }
 }
 
 type Context = Awaited<ReturnType<typeof createContext>>
 
 const t = initTRPC.context<Context>().create({
   transformer: superjson,
+  errorFormatter: ({ shape, error }) => ({
+    ...shape,
+    data: {
+      ...shape.data,
+      zodError:
+        error.cause instanceof z.ZodError
+          ? z.flattenError(error.cause as z.ZodError<Record<string, unknown>>)
+          : null,
+    },
+  }),
 })
 
 const createRouter = t.router
@@ -19,7 +32,7 @@ const durationMiddleware = t.middleware(async ({ path, next }) => {
   const start = Date.now()
 
   if (t._config.isDev) {
-    // artificial delay in dev 100-500ms
+    // Artificial delay in dev 100-500ms.
     const delay = Math.floor(Math.random() * 400) + 100
     await new Promise((resolve) => setTimeout(resolve, delay))
   }
@@ -38,8 +51,8 @@ const durationMiddleware = t.middleware(async ({ path, next }) => {
 const publicProcedure = t.procedure.use(durationMiddleware)
 
 export {
-  createRouter,
-  createContext,
-  publicProcedure,
   type Context,
+  createContext,
+  createRouter,
+  publicProcedure,
 }
