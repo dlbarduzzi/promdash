@@ -65,6 +65,20 @@ function FieldLabel({
   )
 }
 
+function FieldDescription({ className, ...props }: React.ComponentProps<"p">) {
+  return (
+    <p
+      data-slot="field-description"
+      className={cn(
+        "text-left text-sm leading-normal font-normal text-neutral-500",
+        "group-has-data-horizontal/field:text-balance",
+        className,
+      )}
+      {...props}
+    />
+  )
+}
+
 function FieldError({
   className,
   children,
@@ -119,6 +133,7 @@ function FieldError({
 
 export {
   Field,
+  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,

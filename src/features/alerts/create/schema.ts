@@ -27,7 +27,7 @@ const createAlertSchema = createInsertSchema(alert, {
     .min(1, "Query expression is required.")
     .min(EXPR_MIN_CHARS, `Query expression must be at least ${EXPR_MIN_CHARS} characters long.`),
   for: z.coerce
-    .number()
+    .number<string>()
     .min(0, "Minutes in pending state must be at minimum 0.")
     .max(1440, "Minutes in pending state must be at maximum 1440.")
     .transform(value => `${value}m`),
@@ -36,6 +36,27 @@ const createAlertSchema = createInsertSchema(alert, {
   id: true,
   createdAt: true,
   updatedAt: true,
+  // TODO: These should all be validated.
+  action: true,
+  autoPage: true,
+  clusters: true,
+  component: true,
+  customerImpact: true,
+  disableMoogsoft: true,
+  microservice: true,
+  namespace: true,
+  notificationGroupsLab: true,
+  notificationGroupsProd: true,
+  summary: true,
+  owner: true,
+  user: true,
+  dashboard: true,
+  business: true,
+  product: true,
+  platform: true,
+  createdBy: true,
+  updatedBy: true,
+  customFields: true,
 })
 
 type CreateAlertSchema = z.infer<typeof createAlertSchema>

@@ -1,6 +1,6 @@
 "use client"
 
-import z from "zod"
+import type { CreateAlertSchema } from "@/features/alerts/create/schema"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useId, useState } from "react"
@@ -8,51 +8,110 @@ import { Controller, useForm } from "react-hook-form"
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea"
 
 import {
   Field,
+  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
 
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+import { strings } from "@/tools/strings"
 import { cn, delay } from "@/lib/utils"
+import { SEVERITIES } from "@/db/schemas/alert"
+import { createAlertSchema } from "@/features/alerts/create/schema"
 
-const alertSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(5, "Name must be at least 5 characters long.")
-    .max(32, "Name must be at most 32 characters long."),
+const severities = SEVERITIES.map(item => {
+  let description = ""
+  switch (item) {
+    case "disabled":
+      description = "Alert notifications are disabled and no notifications will be sent."
+      break
+    case "info":
+      description = "Informational alert that provides visibility into system activity and does not require action."
+      break
+    case "minor":
+      description = "Low impact issue that may require attention but is unlikely to affect service availability."
+      break
+    case "warning":
+      description = "Potential issue that could lead to service degradation if left unresolved."
+      break
+    case "major":
+      description = "Significant issue affecting service health. Moogsoft creates a situation when the alert fires."
+      break
+    case "critical":
+      description = "Severe issue requiring immediate attention. Moogsoft creates a situation when the alert fires."
+      break
+    default:
+      throw new Error(`unhandled severity: ${item satisfies never}`)
+  }
+  return {
+    label: strings(item).capitalize(),
+    value: item,
+    description,
+  }
 })
-
-type AlertSchema = z.infer<typeof alertSchema>
 
 export function Alerts() {
   const [isDisabled, setIsDisabled] = useState(false)
 
-  const form = useForm<AlertSchema>({
-    resolver: zodResolver(alertSchema),
+  const form = useForm<CreateAlertSchema>({
+    resolver: zodResolver(createAlertSchema),
     defaultValues: {
       name: "",
+      expr: "",
+      for: "5",
+      severity: "warning",
     },
   })
 
   const formId = useId()
   const isSubmitting = form.formState.isSubmitting || isDisabled
 
-  async function onSubmit(data: AlertSchema) {
+  async function onSubmit(data: CreateAlertSchema) {
+    // TODO: Validate query-expression with go-prometheus.
     await delay(2000)
     // eslint-disable-next-line no-console
-    console.log(data.name)
+    console.log(data)
   }
 
   return (
     <div className="p-4">
       <div className="mb-4">
+        <Select>
+          <SelectTrigger className="w-full max-w-48">
+            <SelectValue placeholder="Select a fruit" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Fruits</SelectLabel>
+              <SelectItem value="apple">Apple</SelectItem>
+              <SelectItem value="banana">Banana</SelectItem>
+              <SelectItem value="blueberry">Blueberry</SelectItem>
+              <SelectItem value="grapes">Grapes</SelectItem>
+              <SelectItem value="pineapple">Pineapple</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="mb-4 text-right">
         <Button
           type="button"
           onClick={() => setIsDisabled(() => !isDisabled)}
+          className="bg-neutral-200 text-neutral-900 hover:bg-neutral-300"
         >
           Toggle Disable
         </Button>
@@ -71,7 +130,7 @@ export function Alerts() {
           <form
             id={formId}
             onSubmit={form.handleSubmit(onSubmit)}
-            className="grid gap-y-6"
+            className="grid gap-y-7"
           >
             <FieldGroup>
               <Controller
@@ -91,6 +150,116 @@ export function Alerts() {
                       autoComplete="off"
                       autoCapitalize="off"
                     />
+                    {fieldState.invalid && !isSubmitting ? (
+                      <FieldError errors={[fieldState.error]} />
+                    ) : null}
+                  </Field>
+                )}
+              />
+            </FieldGroup>
+            <FieldGroup>
+              <Controller
+                name="expr"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={`${formId}-expr`}>
+                      Query Expression
+                    </FieldLabel>
+                    <Textarea
+                      {...field}
+                      id={`${formId}-expr`}
+                      disabled={isSubmitting}
+                      aria-invalid={fieldState.invalid}
+                      placeholder='app_request_latency_count{status_code="500"} > 10'
+                      autoComplete="off"
+                      autoCapitalize="off"
+                    />
+                    {fieldState.invalid && !isSubmitting ? (
+                      <FieldError errors={[fieldState.error]} />
+                    ) : null}
+                  </Field>
+                )}
+              />
+            </FieldGroup>
+            <FieldGroup>
+              <Controller
+                name="for"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={`${formId}-for`}>
+                      Minutes in Pending State
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      type="number"
+                      id={`${formId}-for`}
+                      disabled={isSubmitting}
+                      aria-invalid={fieldState.invalid}
+                      min={0}
+                      max={1440}
+                      required
+                      placeholder="5"
+                      autoComplete="off"
+                      formNoValidate={false}
+                    />
+                    {fieldState.invalid && !isSubmitting ? (
+                      <FieldError errors={[fieldState.error]} />
+                    ) : null}
+                    <FieldDescription>
+                      This field defines how long an alert condition must remain true before
+                      {" "}
+                      the alert transitions from a pending state to a firing state. This helps
+                      {" "}
+                      prevent false positives caused by brief spikes, transient failures, or
+                      {" "}
+                      temporary metric fluctuations.
+                    </FieldDescription>
+                  </Field>
+                )}
+              />
+            </FieldGroup>
+            <FieldGroup>
+              <Controller
+                name="severity"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={`${formId}-severity`}>
+                      Severity
+                    </FieldLabel>
+                    <Select
+                      name={field.name}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      disabled={isSubmitting}
+                    >
+                      <SelectTrigger
+                        id={`${formId}-severity`}
+                        aria-invalid={fieldState.invalid}
+                      >
+                        <SelectValue placeholder="Select severity..." />
+                      </SelectTrigger>
+                      <SelectContent position="popper" className="py-1">
+                        {severities.map((severity, index) => (
+                          <span key={severity.value}>
+                            <SelectItem
+                              key={severity.value}
+                              value={severity.value}
+                            >
+                              <span className="block">{severity.label}</span>
+                              <span className="mt-1.5 block text-[0.8rem] text-neutral-500 max-w-md">
+                                {severity.description}
+                              </span>
+                            </SelectItem>
+                            {index === severities.length - 1 ? null : (
+                              <SelectSeparator />
+                            )}
+                          </span>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     {fieldState.invalid && !isSubmitting ? (
                       <FieldError errors={[fieldState.error]} />
                     ) : null}
