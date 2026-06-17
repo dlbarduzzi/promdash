@@ -1,6 +1,7 @@
 "use client"
 
-import type { CreateAlertSchema } from "@/features/alerts/create/schema"
+import type { ClusterSchema } from "@/features/clusters/schema.get"
+import type { CreateAlertSchema } from "@/features/alerts/schema.create"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useId, useState } from "react"
@@ -27,12 +28,11 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-import { strings } from "@/tools/strings"
+import { strings } from "@/tools/strings/base"
 import { useTRPC } from "@/trpc/client/base"
 import { cn, delay } from "@/lib/utils"
 import { SEVERITIES } from "@/db/schemas/alert"
-import { createAlertSchema } from "@/features/alerts/create/schema"
-import type { ClusterSchema } from "@/features/clusters/get/schema"
+import { createAlertSchema } from "@/features/alerts/schema.create"
 
 export function Alerts() {
   const trpc = useTRPC()

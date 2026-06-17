@@ -1,8 +1,8 @@
 import { createRouter } from "./base"
 
-import { healthRouter } from "./apis/health/routers"
-import { alertsRouter } from "./apis/alerts/routers"
-import { clustersRouter } from "./apis/clusters/routers"
+import { healthRouter } from "./apis/health.router"
+import { alertsRouter } from "./apis/alerts.router"
+import { clustersRouter } from "./apis/clusters.router"
 
 const appRouter = createRouter({
   health: healthRouter,

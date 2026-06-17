@@ -1,4 +1,4 @@
-import { getClustersHandler } from "./handlers"
+import { getClustersHandler } from "./clusters.handlers"
 import { createRouter, publicProcedure } from "@/trpc/base"
 
 const clustersRouter = createRouter({

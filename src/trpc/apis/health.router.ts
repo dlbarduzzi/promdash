@@ -1,4 +1,4 @@
-import { getHealthHandler } from "./handlers"
+import { getHealthHandler } from "./health.handlers"
 import { createRouter, publicProcedure } from "@/trpc/base"
 
 const healthRouter = createRouter({

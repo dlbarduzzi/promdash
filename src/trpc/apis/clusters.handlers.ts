@@ -1,13 +1,13 @@
 import type { AppContext } from "@/trpc/types"
-import type { ClusterSchema } from "@/features/clusters/get/schema"
+import type { ClusterSchema } from "@/features/clusters/schema.get"
 
 import z from "zod"
 
 import { env } from "@/lib/server/env"
 import { result } from "@/tools/events/result"
-import { strings } from "@/tools/strings"
+import { strings } from "@/tools/strings/base"
 
-import { clustersResponseSchema } from "@/features/clusters/get/schema"
+import { clustersResponseSchema } from "@/features/clusters/schema.get"
 
 const REQUEST_TIMEOUT_MS = 1000 * 20 // 20 seconds.
 

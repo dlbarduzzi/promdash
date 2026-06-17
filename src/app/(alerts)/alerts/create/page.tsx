@@ -11,7 +11,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { prefetch, trpc } from "@/trpc/server/query"
 
 export const metadata: Metadata = {
-  title: "Alerts",
+  title: "New Alert",
 }
 
 export default function Page() {

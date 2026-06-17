@@ -1,5 +1,5 @@
-import { createAlertSchema } from "@/features/alerts/create/schema"
-import { createAlertHandler } from "./handlers"
+import { createAlertSchema } from "@/features/alerts/schema.create"
+import { createAlertHandler } from "./alerts.handlers"
 import { createRouter, publicProcedure } from "@/trpc/base"
 
 const alertsRouter = createRouter({
